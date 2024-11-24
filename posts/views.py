@@ -7,10 +7,21 @@ from .serializers import PostsSerializer
 
 class PostsList(APIView):
     # Método GET: Lista todos os posts
-    def get(self, request):
-        posts = Posts.objects.all()
-        serializer = PostsSerializer(posts, many=True)
-        return Response(serializer.data)
+   def get(self, request):
+    # Adicionar filtros por query params
+    tipo = request.query_params.get('tipo')
+    status = request.query_params.get('status')
+    
+    # Filtrar conforme os parâmetros, se fornecidos
+    posts = Posts.objects.all()
+    if tipo:
+        posts = posts.filter(tipo=tipo)
+    if status:
+        posts = posts.filter(status=status)
+
+    serializer = PostsSerializer(posts, many=True)
+    return Response(serializer.data)
+
 
     # Método POST: Cria um novo post
     def post(self, request):
