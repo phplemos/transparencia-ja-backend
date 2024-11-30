@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'contratantes',
     'posts',
     'comentarios',
+    'notificacoes',
 ]
 
 MIDDLEWARE = [
