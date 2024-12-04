@@ -62,4 +62,3 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     Customização do TokenObtainPairView para retornar tokens JWT.
     """
     pass  # Se você precisar customizar a resposta, pode fazer isso aqui
-
