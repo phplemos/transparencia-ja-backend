@@ -28,14 +28,14 @@ Backend da aplicação Transparência Já
     **Exemplo de Resposta (200 OK)**:
     ```json
     [
-    {
-        "id": 1,
-        "nome": "João Silva",
-        "email": "joao.silva@example.com",
-        "papel": "admin",
-        "pontos": 0.0,
-        "nivel": 1
-    }
+        {
+            "id": 1,
+            "nome": "João Silva",
+            "email": "joao.silva@example.com",
+            "papel": "admin",
+            "pontos": 0.0,
+            "nivel": 1
+        }
     ]
 
 ### **2. Posts - Publicações**
