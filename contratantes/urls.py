@@ -1,8 +1,7 @@
 from django.urls import path
-from . import views
+from .views import ContratanteList, ContratanteDetail
 
 urlpatterns = [
-    path('contratantes/', views.listar_contratantes, name='listar_contratantes'),  # Endpoint para listar contratantes
-    path('criar/', views.criar_contratante, name='criar_contratante'),  # Endpoint para criar um contratante
-    path('<int:id>/', views.visualizar_contratante, name='visualizar_contratante'),  # Endpoint para visualizar um contratante específico
+    path('contratantes/', ContratanteList.as_view(), name='contratante_list'),
+    path('contratantes/<int:id>/', ContratanteDetail.as_view(), name='contratante_detail'),
 ]

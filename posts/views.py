@@ -4,8 +4,10 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .models import Posts
 from .serializers import PostsSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class PostsList(APIView):
+   permission_classes = [IsAuthenticated]
     # Método GET: Lista todos os posts
    def get(self, request):
     # Adicionar filtros por query params
@@ -24,12 +26,14 @@ class PostsList(APIView):
 
 
     # Método POST: Cria um novo post
-    def post(self, request):
-        serializer = PostsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   def post(self, request):
+    serializer = PostsSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print(serializer.errors)  # Exibe os erros de validação no console
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PostDetail(APIView):
     # Método GET: Retorna um único post pelo ID

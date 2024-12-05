@@ -1,64 +1,64 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Users
-from .serializers import UserSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .serializers import UserSerializer, UserCreateSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-class UsersAPIView(APIView):
+class UsersListCreateAPIView(APIView):
     """
-    API para gerenciar usuários.
+    GET: Lista todos os usuários.
+    POST: Cria um novo usuário.
     """
+    permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        """
-        Método GET para listar todos os usuários.
-        """
-        users = Users.objects.all()  # Busca todos os usuários no banco de dados
-        serializer = UserSerializer(users, many=True)  # Serializa a lista de usuários
+        users = Users.objects.all()
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        """
-        Método POST para criar um novo usuário.
-        """
-        serializer = UserSerializer(data=request.data)
+        serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, *args, **kwargs):
-        """
-        Método PUT para atualizar um usuário existente.
-        """
-        user_id = kwargs.get('pk')
-        try:
-            user = Users.objects.get(id=user_id)
-        except Users.DoesNotExist:
-            return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+class UserDetailAPIView(APIView):
+    """
+    GET, PUT, DELETE para um único usuário.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            user = Users.objects.get(pk=pk)
+            serializer = UserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, *args, **kwargs):
-        """
-        Método DELETE para excluir um usuário existente.
-        """
-        user_id = kwargs.get('pk')
-        try:
-            user = Users.objects.get(id=user_id)
         except Users.DoesNotExist:
-            return Response({"error": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-        user.delete()
-        return Response({"message": "Usuário deletado com sucesso."}, status=status.HTTP_204_NO_CONTENT)
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            user = Users.objects.get(pk=pk)
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Users.DoesNotExist:
+            return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            user = Users.objects.get(pk=pk)
+            user.delete()
+            return Response({"detail": "Usuário excluído com sucesso."}, status=status.HTTP_204_NO_CONTENT)
+        except Users.DoesNotExist:
+            return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """
-    Customização do TokenObtainPairView para retornar tokens JWT.
-    """
-    pass  # Se você precisar customizar a resposta, pode fazer isso aqui
+    serializer_class = CustomTokenObtainPairSerializer

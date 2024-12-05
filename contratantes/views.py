@@ -1,29 +1,52 @@
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import NotFound
 from .models import Contratantes
 from .serializers import ContratantesSerializer
 
-@api_view(['GET'])
-def listar_contratantes(request):
-    # Recupera todos os contratantes do banco de dados
-    contratantes = Contratantes.objects.all()
-    serializer = ContratantesSerializer(contratantes, many=True)
-    return Response({'contratantes': serializer.data})
+# Para listar e criar contratantes
+class ContratanteList(APIView):
+    # Método GET: Lista todos os contratantes
+    def get(self, request):
+        contratantes = Contratantes.objects.all()
+        serializer = ContratantesSerializer(contratantes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def criar_contratante(request):
-    if request.method == 'POST':
+    # Método POST: Cria um novo contratante
+    def post(self, request):
         serializer = ContratantesSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()  # Salva o novo contratante no banco de dados
-            return Response(serializer.data, status=201)  # Retorna os dados criados com status 201
-        return Response(serializer.errors, status=400)  # Caso haja erro na validação
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-def visualizar_contratante(request, id):
-    try:
-        contratante = Contratantes.objects.get(id=id)  # Busca o contratante pelo id
-    except Contratantes.DoesNotExist:
-        return Response({'error': 'Contratante não encontrado'}, status=404)  # Retorna erro se não encontrar
-    serializer = ContratantesSerializer(contratante)
-    return Response({'contratante': serializer.data})
+# Para obter, atualizar e excluir um contratante específico
+class ContratanteDetail(APIView):
+    # Método auxiliar para buscar um contratante pelo ID
+    def get_object(self, id):
+        try:
+            return Contratantes.objects.get(id=id)
+        except Contratantes.DoesNotExist:
+            raise NotFound("Contratante não encontrado")
+
+    # Método GET: Detalha um contratante
+    def get(self, request, id):
+        contratante = self.get_object(id)
+        serializer = ContratantesSerializer(contratante)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # Método PUT: Atualiza um contratante
+    def put(self, request, id):
+        contratante = self.get_object(id)
+        serializer = ContratantesSerializer(contratante, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Método DELETE: Exclui um contratante
+    def delete(self, request, id):
+        contratante = self.get_object(id)
+        contratante.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
