@@ -7,6 +7,7 @@ from .serializers import ComentariosSerializer
 from posts.models import Posts
 from users.models import Users
 
+
 # Listar e criar comentários de um post específico
 class ComentariosList(APIView):
     def get(self, request, post_id):
@@ -66,6 +67,12 @@ class ComentarioDetail(APIView):
     # Deletar um comentário específico
     def delete(self, request, comentario_id):
         comentario = self.get_object(comentario_id)
+        
+        # Verifica se o usuário é o autor do comentário ou tem o papel de 'gestor' ou 'administrador'
+        if comentario.user != request.user and request.user.papel not in ['gestor', 'administrador']:
+            return Response({'error': 'Você não tem permissão para deletar este comentário'},
+                            status=status.HTTP_403_FORBIDDEN)
+        
         comentario.delete()
         return Response({'message': 'Comentário deletado com sucesso'}, status=status.HTTP_204_NO_CONTENT)
 

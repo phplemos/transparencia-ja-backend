@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_yasg',
     'users',
     'contratantes',
     'posts',
@@ -86,8 +87,12 @@ WSGI_APPLICATION = 'transparencia_ja.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'transparencia_ja_database',
+        'USER': 'transparencia_ja_user',
+        'PASSWORD': '1A2B3C4G',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
