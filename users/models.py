@@ -9,14 +9,11 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         extra_fields.setdefault("is_active", True)
 
-        # Criando o usuário com o campo 'email' e 'password' automaticamente
         user = self.model(email=email, **extra_fields)
-
         if password:
-            user.set_password(password)  # Usa o 'set_password' para garantir que a senha seja criptografada
+            user.set_password(password)  # Criptografar a senha
         else:
             raise ValueError("A senha é obrigatória")
-
         user.save(using=self._db)
         return user
 
@@ -42,6 +39,10 @@ class Users(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # Novos campos para geolocalização
+    bairro = models.CharField(max_length=200, null=True, blank=True)
+    rua = models.CharField(max_length=200, null=True, blank=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"
@@ -49,4 +50,3 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-

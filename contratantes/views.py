@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .models import Contratantes
 from .serializers import ContratantesSerializer
+from rest_framework.permissions import AllowAny
 
 # Para listar e criar contratantes
 class ContratanteList(APIView):

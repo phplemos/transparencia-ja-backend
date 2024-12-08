@@ -6,12 +6,16 @@ from .models import Users
 from .serializers import UserSerializer, UserCreateSerializer, CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+
 class UsersListCreateAPIView(APIView):
     """
-    GET: Lista todos os usuários.
-    POST: Cria um novo usuário.
+    GET: Lista todos os usuários (apenas para usuários autenticados).
+    POST: Cria um novo usuário (somente para usuários autenticados).
     """
-    permission_classes = [AllowAny]
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [IsAuthenticated()]  # Mudando para IsAuthenticated
+        return [IsAuthenticated()]
 
     def get(self, request, *args, **kwargs):
         users = Users.objects.all()
@@ -21,18 +25,22 @@ class UsersListCreateAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            # Retornar dados públicos
+            public_serializer = UserSerializer(user)
+            return Response(public_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailAPIView(APIView):
     """
-    GET, PUT, DELETE para um único usuário.
+    GET, PATCH, DELETE para um único usuário (restrito ao proprietário).
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, *args, **kwargs):
+        if not self._is_owner(request, pk):
+            return Response({"detail": "Você não tem permissão para acessar este recurso."}, status=status.HTTP_403_FORBIDDEN)
         try:
             user = Users.objects.get(pk=pk)
             serializer = UserSerializer(user)
@@ -40,7 +48,9 @@ class UserDetailAPIView(APIView):
         except Users.DoesNotExist:
             return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, pk, *args, **kwargs):
+    def patch(self, request, pk, *args, **kwargs):
+        if not self._is_owner(request, pk):
+            return Response({"detail": "Você não tem permissão para modificar este recurso."}, status=status.HTTP_403_FORBIDDEN)
         try:
             user = Users.objects.get(pk=pk)
             serializer = UserSerializer(user, data=request.data, partial=True)
@@ -52,12 +62,17 @@ class UserDetailAPIView(APIView):
             return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk, *args, **kwargs):
+        if not self._is_owner(request, pk):
+            return Response({"detail": "Você não tem permissão para excluir este recurso."}, status=status.HTTP_403_FORBIDDEN)
         try:
             user = Users.objects.get(pk=pk)
             user.delete()
             return Response({"detail": "Usuário excluído com sucesso."}, status=status.HTTP_204_NO_CONTENT)
         except Users.DoesNotExist:
             return Response({"detail": "Usuário não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+    def _is_owner(self, request, pk):
+        return request.user.id == pk
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
