@@ -70,14 +70,14 @@ O **Transparência Já** propõe um **aplicativo móvel** intuitivo e acessível
 * Gera um token de autenticação (JWT) para o usuário.  
   **Parâmetros no corpo da requisição**:  
   ```json
-  {
-      "username": "seu_username",
-      "password": "sua_senha"
-  }
+    {
+        "username": "seu_username",
+        "password": "sua_senha"
+    }
 
-    ##### **Exemplo de JSON para os Endpoints**
+##### **Exemplo de JSON para os Endpoints**
 
-    - **GET /api/users/**: Lista todos os usuários.
+- **GET /api/users/**: Lista todos os usuários.
 
     **Exemplo de Resposta (200 OK)**:
     ```json
