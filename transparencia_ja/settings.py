@@ -88,9 +88,9 @@ WSGI_APPLICATION = 'transparencia_ja.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'transparencia_ja_database',
-        'USER': 'transparencia_ja_user',
-        'PASSWORD': '1A2B3C4G',
+        'NAME': 'nome_do_banco',
+        'USER': 'usuario',
+        'PASSWORD': 'senha',
         'HOST': 'localhost',
         'PORT': '5432',
     }

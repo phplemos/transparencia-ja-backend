@@ -5,7 +5,7 @@ Backend da aplicação Transparência Já
 
 ### **Sobre a API**
 
-Esta API foi desenvolvida como resultado final de um hackathon promovido pela Cepedi, no projeto **Restic36**, realizado no polo de Jequié-BA. Este é o **MVP** de um sistema inovador para gestão social integrada, que visa aumentar a **participação cidadã** e a **transparência governamental**.
+Esta API foi desenvolvida como resultado final de um hackathon promovido pela Cepedi, no projeto **Restic36**, realizado no polo de Jequié-BA. Este é o **MVP** de um sistema para gestão social integrada, que visa aumentar a **participação cidadã** e a **transparência governamental**.
 
 ---
 
@@ -247,6 +247,42 @@ O **Transparência Já** propõe um **aplicativo móvel** intuitivo e acessível
             "deslikes": 0
         }
     ]
+
+---
+
+### **Banco de Dados - PostgreSQL**
+
+O projeto **Transparência Já** utiliza o **PostgreSQL** como sistema de gerenciamento de banco de dados relacional. Ele foi escolhido devido à sua robustez, escalabilidade e suporte avançado a funcionalidades ideais para aplicações de grande porte e com alta performance.
+
+#### **Por que PostgreSQL?**
+
+- **Desempenho e Escalabilidade**  
+  O PostgreSQL é eficiente em lidar com grandes volumes de dados e conexões simultâneas, sendo ideal para sistemas em crescimento.
+
+- **Suporte a Tipos de Dados Avançados**  
+  Oferece suporte a tipos de dados personalizados, JSON/JSONB, arrays e consultas geoespaciais com **PostGIS**.
+
+- **Integridade e Confiabilidade**  
+  - Transações seguras com suporte a **ACID** (Atomicidade, Consistência, Isolamento e Durabilidade).  
+  - Suporte a chaves estrangeiras, restrições e triggers.
+
+- **Comunidade e Extensibilidade**  
+  Uma comunidade ativa e um ecossistema rico de extensões que permitem customizações e otimizações do banco.
+
+
+#### **Configuração no settings.py**
+- Adicione as configurações abaixo ao seu arquivo settings.py:
+    ```bash
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'nome_do_banco',  # Substitua pelo nome do seu banco
+            'USER': 'usuario',        # Seu nome de usuário do PostgreSQL
+            'PASSWORD': 'senha',      # Sua senha do PostgreSQL
+            'HOST': 'localhost',      # Ou o IP do servidor de banco de dados
+             'PORT': '5432',           # Porta padrão do PostgreSQL
+        }
+    }
 
 ---
 
